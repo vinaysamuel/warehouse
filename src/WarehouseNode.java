@@ -1,8 +1,8 @@
 
 public class WarehouseNode extends BnBNode {
 	
-	WarehouseNode(int numItems){
-		super(numItems);
+	WarehouseNode(WarehouseList warehouses, CustomerList customers){
+		super(warehouses.size()+customers.size());
 	}
 	
     public void createMatrix(WarehouseList warehouses, CustomerList customers){
