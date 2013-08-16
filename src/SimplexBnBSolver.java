@@ -1,9 +1,19 @@
+import java.util.ArrayList;
 
-public class SimplexBnBSolver extends BranchNBondSolver {
-	
-	public SimplexBnBSolver(int capacity, int numItems) {
-		super(capacity, numItems);
-		// TODO Auto-generated constructor stub
+
+public class SimplexBnBSolver{
+
+	int optValue;
+	int optVerified = 0;
+	short[] finalDecisions;
+
+	ArrayList <BnBNode> nodes;
+    ArrayList<warehouse> warehouses;
+    ArrayList<customer> customers;	
+		
+	public SimplexBnBSolver(int numItems) {
+		finalDecisions = new short [numItems];
+		nodes = new ArrayList <BnBNode> (0);
 	}
 	
 	public BnBNode chooseNextNode(){
@@ -11,24 +21,38 @@ public class SimplexBnBSolver extends BranchNBondSolver {
 		float[]x;
 		int cnt = 0;
 		
-		temp = super.chooseNextNode();
-		x = temp.simplexSoln.primal();
-//		System.out.print(temp.potentialVal +" ");
-//		for(int i = 0; i < x.length; i++)
-//			System.out.print(x[i]+" ");
-//		System.out.print("\n");
+    	BnBNode bestNode;
+    	bestNode = nodes.get(0);
+    	
+    	for (BnBNode node : nodes){
+    		if (node.potentialVal > bestNode.potentialVal){
+    			bestNode = node;
+    		}
+    	}
+    	
+    	if (bestNode.potentialVal == bestNode.val ){
+    		bestNode.optimum = 1;
+    		for (int i = 0; i < bestNode.decisions.length;i++){
+    			if (bestNode.decisions[i] == -1){
+    				bestNode.decisions[i] = 0;
+    			}
+    		}
+    	}
+    	
+		x = bestNode.simplexSoln.primal();
+
 		for(int i = 0; i < x.length; i++){
 			if (x[i]!=Math.round(x[i])){
-				return temp;
+				return bestNode;
 			}
 		}
 		//Finding the path that corresponds to x
 		
-		for (int i = 0; i<temp.path.length;i++ ){
-			if (temp.path[i]== -1){
-				temp.path[i]= (short) (x[cnt]);
-				if (temp.path[i] == 1){
-					temp.val += items.get(i).value;
+		for (int i = 0; i<bestNode.decisions.length;i++ ){
+			if (bestNode.decisions[i]== -1){
+				bestNode.decisions[i]= (short) (x[cnt]);
+				if (bestNode.decisions[i] == 1){
+					bestNode.val += items.get(i).value;
 				}
 				cnt++;
 			}
@@ -37,6 +61,7 @@ public class SimplexBnBSolver extends BranchNBondSolver {
 		return temp;
 		
 	}
+	
 	int chooseBranch(BnBNode thisNode){
 		int i,cnt;
 		float [] x;
@@ -64,13 +89,13 @@ public class SimplexBnBSolver extends BranchNBondSolver {
 		}
 		//Finding the path idx that corresponds to the idx in x
 		cnt = 0;
-		for (i = 0; i<thisNode.path.length;i++ ){
-			if ((cnt == idx) && (thisNode.path[i] == -1)){
+		for (i = 0; i<thisNode.decisions.length;i++ ){
+			if ((cnt == idx) && (thisNode.decisions[i] == -1)){
 				idx = i;
 				break;
 			}
 			
-			if (thisNode.path[i]== -1)
+			if (thisNode.decisions[i]== -1)
 				cnt++;				
 		}
 		thisNode.reduceMemory();
@@ -125,5 +150,20 @@ public class SimplexBnBSolver extends BranchNBondSolver {
 		}
     }
     
-
+   
+	void solve(ArrayList<warehouse> warehouses_this,  ArrayList<customer> customers_this)
+	{
+		warehouses = warehouses_this;
+		customers = customers_this;
+		
+		BnBNode firstNode;
+		BnBNode optNode;
+		
+		firstNode = getFirstNode();
+		nodes.add(firstNode);
+		optNode = traverseTree (firstNode);
+		optValue = optNode.val;
+		optVerified = 0;
+		itemsPicked = optNode.path;
+	}    
 }

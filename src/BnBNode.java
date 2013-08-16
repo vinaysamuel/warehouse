@@ -12,6 +12,7 @@ public class BnBNode {
     int availableCapacity;
     float potentialVal;
     int optimum;
+    
     float[][] A;
     float[] b;
     float[] c;

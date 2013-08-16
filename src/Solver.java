@@ -30,6 +30,8 @@ public class Solver {
         
         // get the temp file name
         //System.out.print(args[0]+"\n");
+        warehouses = new ArrayList <warehouse>();
+        customers = new ArrayList <customer>();
         for(String arg : args){
             if(arg.startsWith("-file=")){
                 fileName = arg.substring(6);
@@ -58,34 +60,39 @@ public class Solver {
         int num_customers = Integer.parseInt(firstLine[1]);
         
         for(int i=1; i < num_warehouses+1; i++){
-          int warehouse_cost, warehouse_capacity;
+          float warehouse_cost, warehouse_capacity;
           warehouse temp_wh;
           temp_wh = null;
           String line = lines.get(i);
           String[] parts = line.split("\\s+");
 
-          warehouse_cost = Integer.parseInt(parts[0]);
-          warehouse_capacity = Integer.parseInt(parts[1]);
+          warehouse_cost = Float.parseFloat(parts[0]);
+          warehouse_capacity = Float.parseFloat(parts[1]);
           temp_wh = new warehouse(warehouse_cost, warehouse_capacity);
           warehouses.add(temp_wh);
         }
 
         for(int i=1; i < num_customers+1; i++){
-            double customer_demand;
             customer temp_cm;
+            
             temp_cm = null;
             String line = lines.get(i);
+            temp_cm = new customer(num_warehouses);
+            temp_cm.demand = Double.parseDouble(line);
+            line = lines.get(i);
             String[] parts = line.split("\\s+");
-
-            warehouse_cost = Integer.parseInt(parts[0]);
-            warehouse_capacity = Integer.parseInt(parts[1]);
-            temp_wh = new warehouse(warehouse_cost, warehouse_capacity);
-            warehouses.add(temp_wh);
+            for (int j=0; j < num_warehouses; j++){
+                 temp_cm.cost[j] = Double.parseDouble(parts[j]);              	
+            }
+           
+            customers.add(temp_cm);
           }
-        knapSackSolver.solve(knapSackItems);
+        
+        warehouseSolver = new SimplexBnBSolver (num_warehouses);
+        warehouseSolver.solve(warehouses,customers);/*
 		System.out.println(knapSackSolver.optValue+" "+knapSackSolver.optVerified);
 		for (int i = 0; i < items; i++)
 			System.out.print(knapSackSolver.itemsPicked[i]+" ");
-				
+			*/	
     }
 }

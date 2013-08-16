@@ -1,11 +1,13 @@
+import java.util.ArrayList;
+
 
 public class WarehouseNode extends BnBNode {
 	
-	WarehouseNode(WarehouseList warehouses, CustomerList customers){
+	WarehouseNode(ArrayList<warehouse> warehouses, ArrayList<warehouse> customers){
 		super(warehouses.size()+customers.size());
 	}
 	
-    public void createMatrix(WarehouseList warehouses, CustomerList customers){
+    public void createMatrix(ArrayList<warehouse> warehouses, ArrayList<warehouse> customers){
     	int count = 0;
     	for(int i = 0; i<decisions.length;i++){
     		if ((decisions[i] == -1) && (itemList.get(i).weight <= availableCapacity)){
